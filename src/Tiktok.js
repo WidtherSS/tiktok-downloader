@@ -1,50 +1,46 @@
-import React, { useState } from "react";
-import axios from "axios";
-import FileSaver from "file-saver";
+import React, { useState } from 'react';
+import axios from 'axios';
 
 function Tiktok() {
-  const [url, setUrl] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [videoUrl, setVideoUrl] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const response = await axios.get(
-        "https://tiktok-downloader-download-tiktok-videos-without-watermark.p.rapidapi.com/vid/index",
-        {
-          params: { url },
-          headers: {
-            "X-RapidAPI-Key": "5fe8221b2cmshc62b62f1492688dp1d9d5ejsnc517524b5e2d",
-            "X-RapidAPI-Host":
-              "tiktok-downloader-download-tiktok-videos-without-watermark.p.rapidapi.com",
-          },
-          responseType: "blob",
-        }
-      );
-      FileSaver.saveAs(response.data, "tiktok_video.mp4");
-    } catch (error) {
+  const handleInputChange = (event) => {
+    setVideoUrl(event.target.value);
+  };
+
+  const handleDownloadClick = () => {
+    const options = {
+      method: 'GET',
+      url: 'https://tiktok-downloader-download-tiktok-videos-without-watermark.p.rapidapi.com/vid/index',
+      params: { url: videoUrl },
+      headers: {
+        'X-RapidAPI-Key': '5fe8221b2cmshc62b62f1492688dp1d9d5ejsnc517524b5e2d',
+        'X-RapidAPI-Host': 'tiktok-downloader-download-tiktok-videos-without-watermark.p.rapidapi.com',
+      },
+    };
+
+    axios.request(options).then(function (response) {
+      // Extract the video URL from the JSON response
+      const videoUrl = response.data.video[0];
+
+      // Create a new <a> element to trigger the download
+      const downloadLink = document.createElement('a');
+      downloadLink.href = videoUrl;
+      downloadLink.download = 'tiktok-video.mp4';
+
+      // Trigger the download by clicking the link
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }).catch(function (error) {
       console.error(error);
-    }
-    setLoading(false);
+    });
   };
 
   return (
     <div>
-      <h1>TikTok Video Downloader</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          TikTok Video URL:
-          <input
-            type="text"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-        </label>
-        <button type="submit" disabled={loading}>
-          {loading ? "Loading..." : "Download"}
-        </button>
-      </form>
+      <input type="text" value={videoUrl} onChange={handleInputChange} />
+      <button onClick={handleDownloadClick}>Download</button>
     </div>
   );
 }
