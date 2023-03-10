@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { saveAs } from 'file-saver';
 import Swal from 'sweetalert2';
 
 function Tiktok() {
@@ -20,67 +21,50 @@ function Tiktok() {
       },
     };
 
-    axios
-      .request(options)
-      .then(function (response) {
-        // Extract the video URL from the JSON response
-        const videoUrl = response.data.video[0];
+    axios.request(options).then(function (response) {
+      // Extract the video URL from the JSON response
+      const videoUrl = response.data.video[0];
 
-        // Create a new <a> element to trigger the download
-        const downloadLink = document.createElement('a');
-        downloadLink.href = videoUrl;
-        downloadLink.download = 'tiktok-video.mp4';
+      // Download the video using FileSaver
+      saveAs(videoUrl, 'tiktok-video.mp4');
 
-        // Trigger the download by clicking the link
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-      })
-      .catch(function (error) {
-        console.error(error);
+      // Show success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'The video has been downloaded successfully.',
+        text: 'you can thank me by calling me DADDY Adam'
       });
-  };
+    }).catch(function (error) {
+      console.error(error);
 
-  const handleDownloadVideo = () => {
-    if (videoUrl === '') {
+      // Show error message
       Swal.fire({
         icon: 'error',
-        text: 'Please enter a TikTok video URL',
+        title: 'Oops...',
+        text: 'Something went wrong. Please try again later.',
       });
-      return;
-    }
-
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to download this video?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, download it!',
-      cancelButtonText: 'No, cancel',
-      reverseButtons: true,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        handleDownloadClick();
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        Swal.fire('Cancelled', 'The download was cancelled', 'info');
-      }
     });
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <div className="mb-4">
+    <div className="mx-auto max-w-lg p-6">
+      <h1 className="text-4xl text-center mb-6">Put the link here:</h1>
+      <div className="flex flex-row">
         <input
+          className="flex-grow bg-gray-200 rounded-l-lg py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
           type="text"
-          placeholder="Enter TikTok video URL"
           value={videoUrl}
           onChange={handleInputChange}
-          className="border rounded py-2 px-3"
+          placeholder="insert your link here:"
         />
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-lg"
+          onClick={handleDownloadClick}
+        >
+          Download
+        </button>
       </div>
-      <button onClick={handleDownloadVideo} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Download
-      </button>
     </div>
   );
 }
