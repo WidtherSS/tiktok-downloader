@@ -1,9 +1,9 @@
 import Tiktok from "./Tiktok";
-
+import './App.css'
 
 function App() {
   return (
-    <div>
+    <div className="">
       <Tiktok/>
     </div>
   );

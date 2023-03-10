@@ -9,3 +9,8 @@ root.render(
     <App />
   </React.StrictMode>
 );
+<div className='mb-20 text-3xl text-center'>
+<h1>
+    Thanks Your daddy Adam Later
+</h1>
+</div>
